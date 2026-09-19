@@ -114,8 +114,8 @@ function renderSingleRow(d) {
 
   row.innerHTML = `
     <td>${escapeHtml(d.subject)}</td>
-    <td>${escapeHtml(d.category)} <span class="confidence">${pct(d.categoryConfidence)}</span></td>
-    <td>${escapeHtml(d.urgency)} <span class="confidence">${pct(d.urgencyConfidence)}</span></td>
+    <td${detailAttrs(d.categoryProbabilities)}>${escapeHtml(d.category)} <span class="confidence">${pct(d.categoryConfidence)}</span></td>
+    <td${detailAttrs(d.urgencyProbabilities)}>${escapeHtml(d.urgency)} <span class="confidence">${pct(d.urgencyConfidence)}</span></td>
     <td>${d.autoResolvable ? "Yes" : "No"} <span class="confidence">${pct(d.autoResolvableConfidence)}</span></td>
     <td>${actionLabel(d.action)}</td>
     <td>${escapeHtml(d.engineUsed)}</td>
@@ -139,11 +139,13 @@ function renderCompareRow(r) {
     <td>${escapeHtml(r.subject)}</td>
     <td class="${categoryDiff ? "diff" : ""}">${compareCell(
     `${jev.category} ${pctInline(jev.categoryConfidence)}`,
-    `${rb.category} ${pctInline(rb.categoryConfidence)}`
+    `${rb.category} ${pctInline(rb.categoryConfidence)}`,
+    jev.categoryProbabilities
   )}</td>
     <td class="${urgencyDiff ? "diff" : ""}">${compareCell(
     `${jev.urgency} ${pctInline(jev.urgencyConfidence)}`,
-    `${rb.urgency} ${pctInline(rb.urgencyConfidence)}`
+    `${rb.urgency} ${pctInline(rb.urgencyConfidence)}`,
+    jev.urgencyProbabilities
   )}</td>
     <td class="${autoResolvableDiff ? "diff" : ""}">${compareCell(
     `${jev.autoResolvable ? "Yes" : "No"} ${pctInline(jev.autoResolvableConfidence)}`,
@@ -155,9 +157,14 @@ function renderCompareRow(r) {
   compareBody.prepend(row);
 }
 
-function compareCell(jevText, rbText) {
+// jevProbabilities is only ever available on Jev's own line (the rule-based
+// engine has no real distribution), so the hover detail only ever appears there.
+function compareCell(jevText, rbText, jevProbabilities) {
+  const formatted = formatProbabilities(jevProbabilities);
+  const jevClass = formatted ? "compare-line has-detail" : "compare-line";
+  const jevTitle = formatted ? ` title="${escapeAttr(formatted)}"` : "";
   return (
-    `<div class="compare-line"><span class="engine-tag">Jev</span>${escapeHtml(jevText)}</div>` +
+    `<div class="${jevClass}"${jevTitle}><span class="engine-tag">Jev</span>${escapeHtml(jevText)}</div>` +
     `<div class="compare-line"><span class="engine-tag">RB</span>${escapeHtml(rbText)}</div>`
   );
 }
@@ -242,8 +249,30 @@ function pct(value) {
   return `${Math.round(value * 100)}%`;
 }
 
+// Jev's Choice/Score answers include a full probability distribution, not
+// just the winning value — formatted here for a hover tooltip, sorted so
+// the most likely alternatives show first. Only Jev ever produces these;
+// the rule-based engine passes undefined/null and gets no tooltip.
+function formatProbabilities(map) {
+  if (!map) return "";
+  return Object.entries(map)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, value]) => `${label}: ${pct(value)}`)
+    .join(", ");
+}
+
+function detailAttrs(map) {
+  const formatted = formatProbabilities(map);
+  if (!formatted) return "";
+  return ` class="has-detail" title="${escapeAttr(formatted)}"`;
+}
+
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str).replace(/"/g, "&quot;");
 }

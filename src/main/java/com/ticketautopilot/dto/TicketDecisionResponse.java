@@ -4,6 +4,7 @@ import com.ticketautopilot.domain.Decision;
 import com.ticketautopilot.domain.Ticket;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 public record TicketDecisionResponse(
@@ -19,7 +20,9 @@ public record TicketDecisionResponse(
         String action,
         String engineUsed,
         int latencyMs,
-        Instant decidedAt
+        Instant decidedAt,
+        Map<String, Double> categoryProbabilities,
+        Map<String, Double> urgencyProbabilities
 ) {
     public static TicketDecisionResponse from(Ticket ticket, Decision decision) {
         return new TicketDecisionResponse(
@@ -28,7 +31,8 @@ public record TicketDecisionResponse(
                 decision.getUrgency(), decision.getUrgencyConfidence(),
                 decision.isAutoResolvable(), decision.getAutoResolvableConfidence(),
                 decision.getAction(), decision.getEngineUsed(),
-                decision.getLatencyMs(), decision.getDecidedAt()
+                decision.getLatencyMs(), decision.getDecidedAt(),
+                decision.getCategoryProbabilities(), decision.getUrgencyProbabilities()
         );
     }
 }

@@ -63,7 +63,8 @@ public class TriageService {
                 result.urgency(), result.urgencyConfidence(),
                 result.autoResolvable(), result.autoResolvableConfidence(),
                 result.action(), result.engineUsed(),
-                (int) result.latencyMs()
+                (int) result.latencyMs(),
+                result.categoryProbabilities(), result.urgencyProbabilities()
         );
         return decisionRepository.save(decision);
     }

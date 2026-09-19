@@ -100,6 +100,17 @@ class JevDecisionEngineTest {
         assertThat(decision.autoResolvableConfidence()).isCloseTo(0.54, org.assertj.core.data.Offset.offset(1e-9));
         assertThat(decision.engineUsed()).isEqualTo("jev");
         assertThat(decision.latencyMs()).isEqualTo(250L);
+
+        // Full Choice/Score distributions, not just the winning value.
+        assertThat(decision.categoryProbabilities()).containsExactlyInAnyOrderEntriesOf(Map.of(
+                "account", 0.0, "billing", 1.0, "how_to", 0.0, "bug", 0.0, "feature_request", 0.0
+        ));
+        // Urgency probabilities are keyed by rubric position ("0".."3") in the raw
+        // response — remapped to the same low/normal/high/critical labels used
+        // everywhere else, not left as opaque digit strings.
+        assertThat(decision.urgencyProbabilities()).containsExactlyInAnyOrderEntriesOf(Map.of(
+                "low", 0.0, "normal", 0.0, "high", 0.76, "critical", 0.24
+        ));
     }
 
     @Test
@@ -109,6 +120,17 @@ class JevDecisionEngineTest {
 
         TicketDecision belowRange = engine.parseResponse(responseWithUrgencyScore(-0.6), 0L);
         assertThat(belowRange.urgency()).isEqualTo("low");
+    }
+
+    @Test
+    void leavesProbabilitiesNullWhenTheResponseDoesNotIncludeThem() {
+        // Older/minimal response shapes without "probabilities" shouldn't
+        // fail the whole parse — this data is supplementary, not required
+        // for the core auto-route decision.
+        TicketDecision decision = engine.parseResponse(responseWithUrgencyScore(1.0), 0L);
+
+        assertThat(decision.categoryProbabilities()).isNull();
+        assertThat(decision.urgencyProbabilities()).isNull();
     }
 
     @Test
