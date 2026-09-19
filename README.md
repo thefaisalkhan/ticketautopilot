@@ -1,8 +1,9 @@
 # Ticket Triage Copilot
 
 Support-ticket auto-classifier. Primary decision engine is Jev
-(`typesafe/jev-latest`) via OpenRouter, with a rule-based engine as
-fallback/baseline. See `DecisionEngine` for the pluggable interface.
+(`~typesafe/jev-latest`) via OpenRouter, with a rule-based engine as
+fallback/baseline and automatic cost-routing fast path. See
+`DecisionEngine` for the pluggable interface.
 
 ## Stack
 
@@ -18,32 +19,56 @@ fallback/baseline. See `DecisionEngine` for the pluggable interface.
    ```
 2. Run the app (Flyway migrates the schema on startup):
    ```
-   ./mvnw spring-boot:run
+   OPENROUTER_API_KEY=... mvn spring-boot:run
    ```
-   or `mvn spring-boot:run` if you don't have the wrapper installed.
+3. Open `http://localhost:8080/`.
 
 The app reads DB connection info from `DB_URL` / `DB_USERNAME` / `DB_PASSWORD`
 (see `application.yml` for defaults matching `docker-compose.yml`).
 
 ## Config
 
-- `OPENROUTER_API_KEY` — API key for calling Jev via OpenRouter
-  (wired in once `JevDecisionEngine` is built).
-- `OPENROUTER_BASE_URL` — defaults to OpenRouter's standard chat-completions
-  endpoint (`https://openrouter.ai/api/v1/chat/completions`).
+- `OPENROUTER_API_KEY` — API key for calling Jev via OpenRouter.
+- `OPENROUTER_BASE_URL` — defaults to OpenRouter's alpha decisions endpoint
+  (`https://openrouter.ai/api/alpha/decisions`).
 
-Note: `typesafe/jev-latest` doesn't appear in OpenRouter's public model
-catalog or model-page routes as of this writing — it's early access, so the
-model id and the shape of Jev's own request/response fields (as opposed to
-OpenRouter's generic chat-completions envelope) still need confirming with
-a manual test call before `JevDecisionEngine` is wired in for real.
+Jev is a "decisions" model, not a chat model — it's called at
+`POST /api/alpha/decisions`, not `/chat/completions`, and the model id
+needs a leading `~` (`~typesafe/jev-latest`). Confirmed by a manual test
+call; see `JevDecisionEngine` for the exact request/response shape
+(`answers.category.choice`, `answers.urgency.score` as a continuous float,
+`answers.is_auto_resolvable.noul`).
+
+## Engine behavior
+
+- **Jev** (primary) — one call per ticket answering three typed questions
+  (category/urgency/auto-resolvable). If the call fails, `TriageService`
+  automatically falls back to the rule-based engine, labels the decision
+  `engine_used=fallback`, and forces `action=needs_human_review`
+  regardless of confidence.
+- **Cost-routing fast path** — a small hardcoded FAQ phrase list
+  (`FaqFastPathMatcher`) skips Jev entirely for obvious matches (e.g.
+  "reset password"), routing straight to the rule-based engine with
+  `engine_used=rule_based_fast_path`.
+- **Rule-based** — keyword/regex baseline, selectable directly in the
+  dashboard, also used for fallback and the fast path.
+- **Compare both** — `POST /api/tickets/compare` runs one ticket through
+  both engines and persists two decision rows against the same ticket.
+
+`TicketDecisionAggregator` holds the shared thresholding logic (all three
+confidences must exceed 0.75 *and* auto_resolvable must be true to
+auto-route) so it's identical across engines and not delegated to Jev.
 
 ## Build order
 
-1. ~~Scaffold Spring Boot project + Postgres schema/migrations~~ (done)
+1. ~~Scaffold Spring Boot project + Postgres schema/migrations~~
 2. ~~RuleBasedEngine + TicketDecisionAggregator + dashboard, running
-   end-to-end on fake/rule-based data~~ (done)
-3. Manual test call to Jev (via OpenRouter) to confirm request/response
-   field names
-4. JevDecisionEngine wired behind `DecisionEngine`, validated on real tickets
-5. Automatic fallback, cost-routing fast path, engine toggle, compare-both view
+   end-to-end on fake/rule-based data~~
+3. ~~Manual test call to Jev (via OpenRouter) to confirm request/response
+   field names~~
+4. ~~JevDecisionEngine wired behind `DecisionEngine`, validated on real
+   tickets~~
+5. ~~Automatic fallback, cost-routing fast path, engine toggle,
+   compare-both view~~
+
+All steps complete.
