@@ -260,27 +260,4 @@ Compare-both; fallback/fast-path rows don't count as a second opinion,
 since they're the rule-based engine relabeled, not an independent one).
 Charts are inline SVG bar charts, no charting library.
 
-## Testing
 
-39 tests: pure-logic unit tests for the aggregator, both engines, the fast-
-path matcher, and service orchestration (mocked, no I/O), plus one
-Postgres-backed test (`DecisionRepositoryTest`) that verifies the `jsonb`
-probability columns actually round-trip through Hibernate — a real
-database check pure mocks can't cover. `mvn test` runs everything; only
-`DecisionRepositoryTest` needs Postgres running.
-
-## Build order
-
-1. ~~Scaffold Spring Boot project + Postgres schema/migrations~~
-2. ~~RuleBasedEngine + TicketDecisionAggregator + dashboard, running
-   end-to-end on fake/rule-based data~~
-3. ~~Manual test call to Jev (via OpenRouter) to confirm request/response
-   field names~~
-4. ~~JevDecisionEngine wired behind `DecisionEngine`, validated on real
-   tickets~~
-5. ~~Automatic fallback, cost-routing fast path, engine toggle,
-   compare-both view~~
-6. ~~Full Choice/Score probability distributions, CSV import, analytics
-   dashboard~~
-
-All steps complete.
