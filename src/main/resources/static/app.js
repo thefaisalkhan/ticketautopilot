@@ -12,6 +12,9 @@ const subjectInput = document.getElementById("subject");
 const bodyInput = document.getElementById("body");
 const submitBtn = document.getElementById("submitBtn");
 const bulkDemoBtn = document.getElementById("bulkDemoBtn");
+const importBtn = document.getElementById("importBtn");
+const importBtnLabel = document.getElementById("importBtnLabel");
+const importInput = document.getElementById("importInput");
 const resultsBody = document.getElementById("resultsBody");
 const compareBody = document.getElementById("compareBody");
 const emptyState = document.getElementById("emptyState");
@@ -48,19 +51,19 @@ form.addEventListener("submit", async (event) => {
   const body = bodyInput.value.trim();
   if (!subject || !body) return;
 
-  submitBtn.disabled = true;
+  setBusy(true);
   try {
     await submitAndRender(subject, body);
     form.reset();
   } catch (err) {
     alert("Failed to submit ticket: " + err.message);
   } finally {
-    submitBtn.disabled = false;
+    setBusy(false);
   }
 });
 
 bulkDemoBtn.addEventListener("click", async () => {
-  bulkDemoBtn.disabled = true;
+  setBusy(true);
   const originalLabel = bulkDemoBtn.textContent;
   try {
     for (let i = 0; i < SAMPLE_TICKETS.length; i++) {
@@ -71,10 +74,123 @@ bulkDemoBtn.addEventListener("click", async () => {
   } catch (err) {
     alert("Bulk demo failed: " + err.message);
   } finally {
-    bulkDemoBtn.disabled = false;
+    setBusy(false);
     bulkDemoBtn.textContent = originalLabel;
   }
 });
+
+importInput.addEventListener("change", async () => {
+  const file = importInput.files[0];
+  importInput.value = ""; // allow re-selecting the same file later
+  if (!file) return;
+
+  let tickets;
+  try {
+    tickets = ticketsFromCsv(await file.text());
+  } catch (err) {
+    alert("Could not parse CSV: " + err.message);
+    return;
+  }
+
+  if (tickets.length === 0) {
+    alert("No valid rows found. Expected a 'Subject' column and a 'Description' (or 'Body') column.");
+    return;
+  }
+
+  const callCount = state.mode === "compare" ? tickets.length * 2 : tickets.length;
+  if (tickets.length > 30 && !confirm(`Import ${tickets.length} tickets? This makes ${callCount} triage call(s).`)) {
+    return;
+  }
+
+  setBusy(true);
+  const originalLabel = importBtnLabel.textContent;
+  try {
+    for (let i = 0; i < tickets.length; i++) {
+      importBtnLabel.textContent = `Importing (${i + 1}/${tickets.length})...`;
+      await submitAndRender(tickets[i].subject, tickets[i].body);
+    }
+  } catch (err) {
+    alert("Import failed: " + err.message);
+  } finally {
+    setBusy(false);
+    importBtnLabel.textContent = originalLabel;
+  }
+});
+
+function setBusy(busy) {
+  submitBtn.disabled = busy;
+  bulkDemoBtn.disabled = busy;
+  importBtn.classList.toggle("disabled", busy);
+}
+
+// Minimal RFC4180-ish CSV parser: handles quoted fields, embedded commas/newlines,
+// and "" as an escaped quote. Freshdesk's own ticket export (and most CSV exports)
+// produce exactly this shape.
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (inQuotes) {
+      if (char === '"' && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        field += char;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = true;
+    } else if (char === ",") {
+      row.push(field);
+      field = "";
+    } else if (char === "\r") {
+      // skip; \n (below) ends the row
+    } else if (char === "\n") {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function ticketsFromCsv(text) {
+  const rows = parseCsv(text).filter((r) => r.some((cell) => cell.trim() !== ""));
+  if (rows.length < 2) return [];
+
+  const header = rows[0].map((h) => h.trim().toLowerCase());
+  const subjectIdx = header.indexOf("subject");
+  const bodyIdx = header.findIndex((h) => h === "description" || h === "body");
+  if (subjectIdx === -1 || bodyIdx === -1) {
+    throw new Error("Missing a 'Subject' and/or 'Description'/'Body' column header.");
+  }
+
+  const tickets = [];
+  for (let i = 1; i < rows.length; i++) {
+    const subject = (rows[i][subjectIdx] || "").trim();
+    const body = (rows[i][bodyIdx] || "").trim();
+    if (subject && body) {
+      tickets.push({ subject, body });
+    }
+  }
+  return tickets;
+}
 
 async function submitAndRender(subject, body) {
   if (state.mode === "compare") {

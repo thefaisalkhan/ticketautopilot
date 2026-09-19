@@ -8,8 +8,15 @@
 </head>
 <body>
 <header>
-  <h1>Ticket Triage Copilot</h1>
-  <p class="subtitle">Auto-classifies support tickets with Jev, a rule-based baseline, or both side by side</p>
+  <div class="header-row">
+    <div>
+      <h1>Ticket Triage Copilot</h1>
+      <p class="subtitle">Auto-classifies support tickets with Jev, a rule-based baseline, or both side by side</p>
+    </div>
+    <nav class="top-nav">
+      <a href="analytics.html">Analytics &rarr;</a>
+    </nav>
+  </div>
 </header>
 
 <section class="panel engine-panel">
@@ -64,7 +71,12 @@
     <div class="form-actions">
       <button type="submit" id="submitBtn">Submit ticket</button>
       <button type="button" id="bulkDemoBtn">Bulk demo mode</button>
+      <label class="file-btn" id="importBtn" for="importInput">
+        <span id="importBtnLabel">Import CSV</span>
+        <input type="file" id="importInput" accept=".csv,text/csv" hidden />
+      </label>
     </div>
+    <p class="hint">CSV needs a <code>Subject</code> column and a <code>Description</code> (or <code>Body</code>) column &mdash; matches a standard Freshdesk ticket export.</p>
   </form>
 </section>
 
