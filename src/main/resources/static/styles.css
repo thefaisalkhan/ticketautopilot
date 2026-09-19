@@ -36,6 +36,24 @@ header h1 {
   font-size: 14px;
 }
 
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.top-nav a {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.top-nav a:hover {
+  text-decoration: underline;
+}
+
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -159,6 +177,42 @@ button {
   color: var(--text);
 }
 
+#ticketForm .file-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #eef0f5;
+  color: var(--text);
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+#ticketForm .file-btn:hover {
+  background: #e3e6ee;
+}
+
+#ticketForm .file-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+.hint code {
+  background: #f1f2f6;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -233,4 +287,41 @@ td.diff {
   font-size: 13px;
   text-align: center;
   padding: 12px 0 0;
+}
+
+.chart {
+  margin-top: 8px;
+}
+
+.chart-axis-label {
+  font-size: 12px;
+  fill: var(--text);
+}
+
+.chart-value-label {
+  font-size: 12px;
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
 }
