@@ -82,7 +82,7 @@ public class JevDecisionEngine implements DecisionEngine {
         return "jev";
     }
 
-    private Map<String, Object> buildRequestBody(Ticket ticket) {
+    Map<String, Object> buildRequestBody(Ticket ticket) {
         Map<String, Object> state = new LinkedHashMap<>();
         state.put("subject", ticket.getSubject());
         state.put("body", ticket.getBody());
@@ -114,11 +114,17 @@ public class JevDecisionEngine implements DecisionEngine {
         return body;
     }
 
-    private TicketDecision parseResponse(String rawResponse, long latencyMs) {
+    TicketDecision parseResponse(String rawResponse, long latencyMs) {
         try {
             JsonNode answers = objectMapper.readTree(rawResponse).path("answers");
+            if (answers.isMissingNode()) {
+                throw new IllegalStateException("response has no \"answers\" field");
+            }
 
             String category = answers.path("category").path("choice").asText();
+            if (category.isBlank()) {
+                throw new IllegalStateException("response has no answers.category.choice");
+            }
             double categoryConfidence = answers.path("category").path("confidence").asDouble();
 
             double urgencyScoreRaw = answers.path("urgency").path("score").asDouble();
