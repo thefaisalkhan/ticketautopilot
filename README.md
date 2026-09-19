@@ -67,6 +67,24 @@ fabricate one.
 confidences must exceed 0.75 *and* auto_resolvable must be true to
 auto-route) so it's identical across engines and not delegated to Jev.
 
+## Importing real tickets
+
+The dashboard's "Import CSV" button (next to Bulk demo mode) parses a CSV
+with `Subject` and `Description`/`Body` columns — the same shape a standard
+Freshdesk ticket export uses — and feeds each row through the currently
+selected engine mode. No backend endpoint; parsing happens client-side.
+
+## Analytics
+
+`analytics.html` (linked from the dashboard header) is a historical view
+over every logged decision, backed by `GET /api/analytics/summary`:
+category/urgency/engine distributions, avg latency per engine, decisions
+per day, and the Jev/rule-based agreement rate — computed only from tickets
+that have been triaged by both engines on the same ticket (i.e. via
+Compare-both; fallback/fast-path rows don't count as a second opinion,
+since they're the rule-based engine relabeled, not an independent one).
+Charts are inline SVG bar charts, no charting library.
+
 ## Build order
 
 1. ~~Scaffold Spring Boot project + Postgres schema/migrations~~

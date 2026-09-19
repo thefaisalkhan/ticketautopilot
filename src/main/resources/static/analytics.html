@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ticket Triage Copilot &mdash; Analytics</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <div class="header-row">
+    <div>
+      <h1>Analytics</h1>
+      <p class="subtitle">Historical view across every logged decision</p>
+    </div>
+    <nav class="top-nav">
+      <a href="index.html">&larr; Triage dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<section class="stats-bar" id="summaryStats">
+  <div class="stat">
+    <span class="stat-value" id="statTotal">&ndash;</span>
+    <span class="stat-label">Total decisions</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statAutoRoute">&ndash;</span>
+    <span class="stat-label">Auto-routed</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statConfidence">&ndash;</span>
+    <span class="stat-label">Avg confidence</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statAgreement">&ndash;</span>
+    <span class="stat-label">Jev / rule-based agreement</span>
+  </div>
+</section>
+
+<section class="panel" id="emptyPanel" style="display: none">
+  <p class="empty-state">No decisions logged yet &mdash; go triage some tickets on the dashboard first.</p>
+</section>
+
+<div id="chartsWrap">
+  <section class="panel">
+    <h2>Category distribution</h2>
+    <div class="chart" id="categoryChart"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Urgency distribution</h2>
+    <div class="chart" id="urgencyChart"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Engine usage</h2>
+    <div class="chart-legend" id="engineLegend"></div>
+    <div class="chart" id="engineChart"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Avg latency by engine</h2>
+    <div class="chart" id="latencyChart"></div>
+  </section>
+
+  <section class="panel" id="dailySection">
+    <h2>Decisions per day</h2>
+    <div class="chart" id="dailyChart"></div>
+    <p class="empty-state" id="dailyEmptyNote" style="display: none">Not enough data across multiple days yet.</p>
+  </section>
+</div>
+
+<script src="analytics.js"></script>
+</body>
+</html>
