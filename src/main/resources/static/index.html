@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ticket Triage Copilot</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <h1>Ticket Triage Copilot</h1>
+  <p class="subtitle">Rule-based engine (v1) &mdash; auto-classifies support tickets</p>
+</header>
+
+<section class="stats-bar">
+  <div class="stat">
+    <span class="stat-value" id="statCount">0</span>
+    <span class="stat-label">Tickets processed</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statAutoRoute">0%</span>
+    <span class="stat-label">Auto-routed</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statConfidence">&ndash;</span>
+    <span class="stat-label">Avg confidence</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="statLatency">&ndash;</span>
+    <span class="stat-label">Avg latency</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Submit a ticket</h2>
+  <form id="ticketForm">
+    <label for="subject">Subject</label>
+    <input id="subject" type="text" required placeholder="e.g. Can't log into my account" />
+
+    <label for="body">Body</label>
+    <textarea id="body" required rows="4" placeholder="Describe the issue..."></textarea>
+
+    <div class="form-actions">
+      <button type="submit" id="submitBtn">Submit ticket</button>
+      <button type="button" id="bulkDemoBtn">Bulk demo mode</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Results</h2>
+  <div class="table-wrap">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Category</th>
+          <th>Urgency</th>
+          <th>Auto-resolvable</th>
+          <th>Action</th>
+          <th>Engine</th>
+          <th>Latency</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+  <p id="emptyState" class="empty-state">No tickets yet &mdash; submit one above or try bulk demo mode.</p>
+</section>
+
+<script src="samples.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
