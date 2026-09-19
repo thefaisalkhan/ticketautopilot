@@ -9,25 +9,46 @@
 <body>
 <header>
   <h1>Ticket Triage Copilot</h1>
-  <p class="subtitle">Rule-based engine (v1) &mdash; auto-classifies support tickets</p>
+  <p class="subtitle">Auto-classifies support tickets with Jev, a rule-based baseline, or both side by side</p>
 </header>
 
-<section class="stats-bar">
-  <div class="stat">
+<section class="panel engine-panel">
+  <h2>Engine</h2>
+  <div class="engine-toggle" id="engineToggle">
+    <button type="button" class="engine-btn active" data-engine="jev">Jev</button>
+    <button type="button" class="engine-btn" data-engine="rule_based">Rule-based</button>
+    <button type="button" class="engine-btn" data-engine="compare">Compare both</button>
+  </div>
+</section>
+
+<section class="stats-bar" id="statsBar" data-mode="single">
+  <div class="stat" data-mode="both">
     <span class="stat-value" id="statCount">0</span>
     <span class="stat-label">Tickets processed</span>
   </div>
-  <div class="stat">
+  <div class="stat" data-mode="both">
     <span class="stat-value" id="statAutoRoute">0%</span>
     <span class="stat-label">Auto-routed</span>
   </div>
-  <div class="stat">
+  <div class="stat" data-mode="both">
     <span class="stat-value" id="statConfidence">&ndash;</span>
     <span class="stat-label">Avg confidence</span>
   </div>
-  <div class="stat">
+  <div class="stat" data-mode="single">
     <span class="stat-value" id="statLatency">&ndash;</span>
     <span class="stat-label">Avg latency</span>
+  </div>
+  <div class="stat" data-mode="compare">
+    <span class="stat-value" id="statLatencyJev">&ndash;</span>
+    <span class="stat-label">Avg latency (Jev)</span>
+  </div>
+  <div class="stat" data-mode="compare">
+    <span class="stat-value" id="statLatencyRuleBased">&ndash;</span>
+    <span class="stat-label">Avg latency (Rule-based)</span>
+  </div>
+  <div class="stat" data-mode="compare">
+    <span class="stat-value" id="statAgreement">&ndash;</span>
+    <span class="stat-label">Agreement rate</span>
   </div>
 </section>
 
@@ -49,7 +70,8 @@
 
 <section class="panel">
   <h2>Results</h2>
-  <div class="table-wrap">
+
+  <div class="table-wrap" id="singleResultsWrap">
     <table id="resultsTable">
       <thead>
         <tr>
@@ -65,6 +87,23 @@
       <tbody id="resultsBody"></tbody>
     </table>
   </div>
+
+  <div class="table-wrap" id="compareResultsWrap" style="display: none">
+    <table id="compareTable">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Category</th>
+          <th>Urgency</th>
+          <th>Auto-resolvable</th>
+          <th>Action</th>
+          <th>Latency</th>
+        </tr>
+      </thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+  </div>
+
   <p id="emptyState" class="empty-state">No tickets yet &mdash; submit one above or try bulk demo mode.</p>
 </section>
 

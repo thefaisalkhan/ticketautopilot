@@ -9,6 +9,8 @@
   --green-border: #34a853;
   --yellow-bg: #fff8e1;
   --yellow-border: #f0ad0e;
+  --diff-bg: #fde8e8;
+  --diff-border: #e0554f;
 }
 
 * {
@@ -36,9 +38,14 @@ header h1 {
 
 .stats-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin-bottom: 24px;
+}
+
+.stats-bar[data-mode="single"] .stat[data-mode="compare"],
+.stats-bar[data-mode="compare"] .stat[data-mode="single"] {
+  display: none;
 }
 
 .stat {
@@ -74,6 +81,29 @@ header h1 {
 .panel h2 {
   margin-top: 0;
   font-size: 16px;
+}
+
+.engine-panel {
+  padding: 14px 24px;
+}
+
+.engine-panel h2 {
+  display: none;
+}
+
+.engine-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.engine-btn {
+  background: #eef0f5;
+  color: var(--text);
+}
+
+.engine-btn.active {
+  background: var(--accent);
+  color: white;
 }
 
 #ticketForm {
@@ -171,6 +201,25 @@ tr.row-review {
 .confidence {
   color: var(--muted);
   font-size: 11px;
+}
+
+.compare-line {
+  white-space: nowrap;
+  line-height: 1.7;
+}
+
+.engine-tag {
+  display: inline-block;
+  min-width: 26px;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+td.diff {
+  background: var(--diff-bg);
+  border-left: 3px solid var(--diff-border);
 }
 
 .empty-state {
