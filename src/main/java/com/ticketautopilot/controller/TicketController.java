@@ -1,5 +1,6 @@
 package com.ticketautopilot.controller;
 
+import com.ticketautopilot.dto.TicketCompareResponse;
 import com.ticketautopilot.dto.TicketDecisionResponse;
 import com.ticketautopilot.dto.TicketRequest;
 import com.ticketautopilot.service.TriageService;
@@ -23,5 +24,10 @@ public class TicketController {
     public TicketDecisionResponse submit(@Valid @RequestBody TicketRequest request) {
         String engine = request.engine() != null ? request.engine() : "rule_based";
         return triageService.triage(request.subject(), request.body(), engine);
+    }
+
+    @PostMapping("/compare")
+    public TicketCompareResponse compare(@Valid @RequestBody TicketRequest request) {
+        return triageService.compare(request.subject(), request.body());
     }
 }

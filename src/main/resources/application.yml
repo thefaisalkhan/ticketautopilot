@@ -22,9 +22,12 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
-# Vercel AI Gateway config for the Jev decision engine (wired in a later step).
+# OpenRouter config for the Jev decision engine.
+# Jev is a "decisions" model, not a chat model — it's called via OpenRouter's
+# alpha decisions endpoint (confirmed with a manual test call), not
+# /chat/completions. The model id needs the leading "~".
 ticketautopilot:
   jev:
-    api-key: ${VERCEL_AI_GATEWAY_API_KEY:}
-    base-url: ${VERCEL_AI_GATEWAY_BASE_URL:}
-    model-id: typesafe-ai/jev
+    api-key: ${OPENROUTER_API_KEY:}
+    base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/alpha/decisions}
+    model-id: ~typesafe/jev-latest

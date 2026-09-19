@@ -15,7 +15,7 @@
     <artifactId>ticket-triage-copilot</artifactId>
     <version>0.1.0</version>
     <name>ticket-triage-copilot</name>
-    <description>Support-ticket auto-classifier powered by Jev via Vercel AI Gateway</description>
+    <description>Support-ticket auto-classifier powered by Jev via OpenRouter</description>
 
     <properties>
         <java.version>21</java.version>

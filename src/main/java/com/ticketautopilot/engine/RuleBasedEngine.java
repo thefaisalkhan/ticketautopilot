@@ -83,7 +83,7 @@ public class RuleBasedEngine implements DecisionEngine {
         double autoResolvableConfidence = aggregator.deriveAutoResolvableConfidence(autoResolvableProbability, autoResolvable);
         String urgencyLabel = aggregator.mapUrgencyScoreToLabel(urgency.score());
 
-        String action = aggregator.decideAction(category.confidence(), urgency.confidence(), autoResolvableConfidence);
+        String action = aggregator.decideAction(autoResolvable, category.confidence(), urgency.confidence(), autoResolvableConfidence);
 
         long latencyMs = (System.nanoTime() - start) / 1_000_000;
 
