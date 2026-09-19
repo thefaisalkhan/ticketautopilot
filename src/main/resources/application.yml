@@ -22,12 +22,12 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
-# OpenRouter config for the Jev decision engine (wired in a later step).
-# Jev is accessed as a chat-completions model on OpenRouter; the exact
-# request/response field names Jev itself expects still need a manual
-# test call to confirm (see README).
+# OpenRouter config for the Jev decision engine.
+# Jev is a "decisions" model, not a chat model — it's called via OpenRouter's
+# alpha decisions endpoint (confirmed with a manual test call), not
+# /chat/completions. The model id needs the leading "~".
 ticketautopilot:
   jev:
     api-key: ${OPENROUTER_API_KEY:}
-    base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/v1/chat/completions}
-    model-id: typesafe/jev-latest
+    base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api/alpha/decisions}
+    model-id: ~typesafe/jev-latest

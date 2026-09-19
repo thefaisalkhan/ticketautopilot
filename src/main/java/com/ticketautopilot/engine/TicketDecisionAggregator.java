@@ -31,8 +31,13 @@ public class TicketDecisionAggregator {
         return autoResolvable ? probability : 1 - probability;
     }
 
-    public String decideAction(double categoryConfidence, double urgencyConfidence, double autoResolvableConfidence) {
-        boolean confidentEnough = categoryConfidence > CONFIDENCE_THRESHOLD
+    public String decideAction(boolean autoResolvable, double categoryConfidence, double urgencyConfidence,
+                                double autoResolvableConfidence) {
+        // autoResolvable must actually be true here: a confident "this needs a
+        // human" answer has high autoResolvableConfidence too, and must never
+        // auto-route just because the model is sure about saying no.
+        boolean confidentEnough = autoResolvable
+                && categoryConfidence > CONFIDENCE_THRESHOLD
                 && urgencyConfidence > CONFIDENCE_THRESHOLD
                 && autoResolvableConfidence > CONFIDENCE_THRESHOLD;
         return confidentEnough ? "auto_route" : "needs_human_review";
