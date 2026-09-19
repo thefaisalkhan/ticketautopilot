@@ -81,4 +81,17 @@ class RuleBasedEngineTest {
         assertThat(decision.autoResolvable()).isFalse();
         assertThat(decision.action()).isEqualTo("needs_human_review");
     }
+
+    @Test
+    void neverFabricatesAProbabilityDistributionItDoesNotHave() {
+        // Unlike Jev, the keyword baseline has no real probability distribution
+        // over categories or urgency levels — it must leave these null rather
+        // than inventing one that would look like real model output.
+        Ticket ticket = new Ticket("Overcharged on my invoice", "Please refund the duplicate charge.");
+
+        TicketDecision decision = engine.evaluate(ticket);
+
+        assertThat(decision.categoryProbabilities()).isNull();
+        assertThat(decision.urgencyProbabilities()).isNull();
+    }
 }

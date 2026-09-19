@@ -222,6 +222,12 @@ td.diff {
   border-left: 3px solid var(--diff-border);
 }
 
+.has-detail {
+  cursor: help;
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 3px;
+}
+
 .empty-state {
   color: var(--muted);
   font-size: 13px;

@@ -39,6 +39,14 @@ call; see `JevDecisionEngine` for the exact request/response shape
 (`answers.category.choice`, `answers.urgency.score` as a continuous float,
 `answers.is_auto_resolvable.noul`).
 
+Jev's Choice and Score questions also return a `probabilities` field — the
+full distribution across all categories, or all four urgency levels, not
+just the winning value. This is parsed, persisted (`category_probabilities`
+/ `urgency_probabilities`, `jsonb` columns), returned in the API, and shown
+as a hover tooltip on the dashboard's category/urgency cells — Jev's cells
+only, since the rule-based engine has no real distribution and doesn't
+fabricate one.
+
 ## Engine behavior
 
 - **Jev** (primary) — one call per ticket answering three typed questions

@@ -1,7 +1,11 @@
 package com.ticketautopilot.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -45,13 +49,24 @@ public class Decision {
     @Column(name = "decided_at", nullable = false)
     private Instant decidedAt;
 
+    // Only Jev populates these (its Choice/Score answers include a full
+    // probability distribution); the rule-based engine leaves them null.
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "category_probabilities", columnDefinition = "jsonb")
+    private Map<String, Double> categoryProbabilities;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "urgency_probabilities", columnDefinition = "jsonb")
+    private Map<String, Double> urgencyProbabilities;
+
     protected Decision() {
     }
 
     public Decision(UUID ticketId, String category, double categoryConfidence,
                      String urgency, double urgencyConfidence,
                      boolean autoResolvable, double autoResolvableConfidence,
-                     String action, String engineUsed, int latencyMs) {
+                     String action, String engineUsed, int latencyMs,
+                     Map<String, Double> categoryProbabilities, Map<String, Double> urgencyProbabilities) {
         this.ticketId = ticketId;
         this.category = category;
         this.categoryConfidence = categoryConfidence;
@@ -62,6 +77,8 @@ public class Decision {
         this.action = action;
         this.engineUsed = engineUsed;
         this.latencyMs = latencyMs;
+        this.categoryProbabilities = categoryProbabilities;
+        this.urgencyProbabilities = urgencyProbabilities;
     }
 
     @PrePersist
@@ -117,5 +134,13 @@ public class Decision {
 
     public Instant getDecidedAt() {
         return decidedAt;
+    }
+
+    public Map<String, Double> getCategoryProbabilities() {
+        return categoryProbabilities;
+    }
+
+    public Map<String, Double> getUrgencyProbabilities() {
+        return urgencyProbabilities;
     }
 }

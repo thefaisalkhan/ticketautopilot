@@ -139,11 +139,15 @@ public class JevDecisionEngine implements DecisionEngine {
             String urgencyLabel = aggregator.mapUrgencyScoreToLabel(urgencyScore);
             String action = aggregator.decideAction(autoResolvable, categoryConfidence, urgencyConfidence, autoResolvableConfidence);
 
+            Map<String, Double> categoryProbabilities = parseProbabilities(answers.path("category").path("probabilities"));
+            Map<String, Double> urgencyProbabilities = parseUrgencyProbabilities(answers.path("urgency").path("probabilities"));
+
             return new TicketDecision(
                     category, categoryConfidence,
                     urgencyLabel, urgencyConfidence,
                     autoResolvable, autoResolvableConfidence,
-                    action, engineName(), latencyMs
+                    action, engineName(), latencyMs,
+                    categoryProbabilities, urgencyProbabilities
             );
         } catch (Exception e) {
             throw new JevEngineException("Failed to parse Jev response: " + rawResponse, e);
@@ -152,5 +156,44 @@ public class JevDecisionEngine implements DecisionEngine {
 
     private int clampUrgencyScore(long rounded) {
         return (int) Math.max(0, Math.min(3, rounded));
+    }
+
+    /**
+     * Category probabilities come back keyed by category name already
+     * (e.g. {"billing": 1, "bug": 0, ...}) — copied through as-is.
+     */
+    private Map<String, Double> parseProbabilities(JsonNode probabilitiesNode) {
+        if (probabilitiesNode.isMissingNode() || !probabilitiesNode.isObject()) {
+            return null;
+        }
+        Map<String, Double> probabilities = new LinkedHashMap<>();
+        probabilitiesNode.fields().forEachRemaining(entry -> probabilities.put(entry.getKey(), entry.getValue().asDouble()));
+        return probabilities;
+    }
+
+    /**
+     * Urgency probabilities come back keyed by rubric position ("0".."3"),
+     * e.g. {"0": 0.05, "1": 0.83, "2": 0.12, "3": 0}. Remapped to the same
+     * low/normal/high/critical labels used everywhere else so this data is
+     * self-explanatory without cross-referencing the rubric. A key that
+     * doesn't parse as 0-3 is skipped rather than failing the whole
+     * response, since this is supplementary display data, not something
+     * the auto-route decision depends on.
+     */
+    private Map<String, Double> parseUrgencyProbabilities(JsonNode probabilitiesNode) {
+        if (probabilitiesNode.isMissingNode() || !probabilitiesNode.isObject()) {
+            return null;
+        }
+        Map<String, Double> probabilities = new LinkedHashMap<>();
+        probabilitiesNode.fields().forEachRemaining(entry -> {
+            try {
+                int score = Integer.parseInt(entry.getKey());
+                String label = aggregator.mapUrgencyScoreToLabel(score);
+                probabilities.put(label, entry.getValue().asDouble());
+            } catch (IllegalArgumentException ignored) {
+                // Not a 0-3 rubric position; skip rather than fail the whole parse.
+            }
+        });
+        return probabilities;
     }
 }
