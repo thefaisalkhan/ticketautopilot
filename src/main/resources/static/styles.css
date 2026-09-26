@@ -43,6 +43,11 @@ header h1 {
   gap: 16px;
 }
 
+.top-nav {
+  display: flex;
+  gap: 16px;
+}
+
 .top-nav a {
   color: var(--accent);
   font-size: 14px;

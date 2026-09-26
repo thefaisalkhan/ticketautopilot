@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Candidate Reranking — Ticket Triage Copilot</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="candidate-ranking.css" />
+</head>
+<body>
+<header>
+  <div class="header-row">
+    <div>
+      <h1>Candidate Reranking</h1>
+      <p class="subtitle">Ranks candidate resumes against a job posting using Jev's Choice / Score / Noul primitives &mdash; same engine, pointed at hiring instead of tickets</p>
+    </div>
+    <nav class="top-nav">
+      <a href="index.html">&larr; Ticket triage</a>
+    </nav>
+  </div>
+</header>
+
+<section class="panel">
+  <h2>Job posting</h2>
+  <form id="jobForm">
+    <label for="jobTitle">Job title</label>
+    <input id="jobTitle" type="text" required placeholder="e.g. Senior Backend Engineer" />
+
+    <label for="jobDescription">Job description &amp; requirements</label>
+    <textarea id="jobDescription" required rows="4" placeholder="Paste the job description, including must-have and nice-to-have requirements..."></textarea>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="candidates-header">
+    <h2>Candidates</h2>
+    <div class="form-actions">
+      <button type="button" id="addCandidateBtn">+ Add candidate</button>
+      <button type="button" id="loadSampleBtn">Load sample job &amp; candidates</button>
+    </div>
+  </div>
+  <div id="candidateList"></div>
+
+  <div class="form-actions">
+    <button type="submit" form="jobForm" id="rankBtn">Rank candidates</button>
+  </div>
+  <p class="hint">Each candidate is scored independently against the job posting above &mdash; Jev never sees the other candidates, so results are auditable per-resume.</p>
+</section>
+
+<section class="panel">
+  <h2>Ranked results</h2>
+  <div class="table-wrap" id="resultsWrap">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Candidate</th>
+          <th>Fit tier</th>
+          <th>Match score</th>
+          <th>Interview?</th>
+          <th>Latency</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+  <p id="emptyState" class="empty-state">No rankings yet &mdash; add candidates above and click Rank candidates, or load the sample data.</p>
+</section>
+
+<script src="candidate-samples.js"></script>
+<script src="candidate-ranking.js"></script>
+</body>
+</html>
