@@ -103,8 +103,16 @@ tr.row-not-a-fit {
   cursor: help;
 }
 
+.score-number {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 24px;
+  text-align: right;
+}
+
 .score-bar {
-  width: 80px;
+  width: 70px;
   height: 8px;
   border-radius: 4px;
   background: #e0e2e7;

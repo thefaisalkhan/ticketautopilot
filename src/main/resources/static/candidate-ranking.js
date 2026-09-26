@@ -92,6 +92,7 @@ function renderResults(results) {
         <span class="confidence">${pct(r.fitTierConfidence)}</span></td>
       <td>
         <div class="score-bar-wrap" title="${escapeAttr(formatProbabilities(r.matchScoreProbabilities))}">
+          <span class="score-number">${scorePct}</span>
           <div class="score-bar"><div class="score-bar-fill" style="width:${scorePct}%"></div></div>
           <span class="score-label">${escapeHtml(r.matchScoreLabel)}</span>
         </div>
