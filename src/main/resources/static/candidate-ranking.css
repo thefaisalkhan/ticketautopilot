@@ -1,0 +1,130 @@
+.candidates-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.candidates-header h2 {
+  margin: 0;
+}
+
+.candidate-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.candidate-row:first-child {
+  padding-top: 16px;
+}
+
+.candidate-row-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.candidate-row input,
+.candidate-row textarea {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 11px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  width: 100%;
+}
+
+.remove-candidate-btn {
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 10px;
+}
+
+.remove-candidate-btn:hover {
+  color: var(--diff-border);
+}
+
+#addCandidateBtn,
+#loadSampleBtn {
+  background: #eef0f5;
+  color: var(--text);
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tier-strong_fit {
+  background: var(--green-bg);
+  color: #1a7a35;
+}
+
+.tier-potential_fit {
+  background: var(--yellow-bg);
+  color: #9a6a00;
+}
+
+.tier-not_a_fit {
+  background: var(--diff-bg);
+  color: #a13a35;
+}
+
+tr.row-strong-fit {
+  background: var(--green-bg);
+  border-left: 3px solid var(--green-border);
+}
+
+tr.row-potential-fit {
+  background: var(--yellow-bg);
+  border-left: 3px solid var(--yellow-border);
+}
+
+tr.row-not-a-fit {
+  background: var(--diff-bg);
+  border-left: 3px solid var(--diff-border);
+}
+
+.score-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: help;
+}
+
+.score-number {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 24px;
+  text-align: right;
+}
+
+.score-bar {
+  width: 70px;
+  height: 8px;
+  border-radius: 4px;
+  background: #e0e2e7;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.score-label {
+  font-size: 12px;
+  white-space: nowrap;
+}
